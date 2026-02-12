@@ -127,6 +127,27 @@ app.use(express.json());
 // Health endpoint for quick checks (Render and browsers)
 app.get("/", (req, res) => res.status(200).send("OK"));
 
+// Debug route: list registered routes (temporary)
+app.get("/__routes", (req, res) => {
+  const routes = [];
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      // routes registered directly on the app
+      const methods = Object.keys(middleware.route.methods).join(',');
+      routes.push({ path: middleware.route.path, methods });
+    } else if (middleware.name === 'router') {
+      // router middleware
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          const methods = Object.keys(handler.route.methods).join(',');
+          routes.push({ path: handler.route.path, methods });
+        }
+      });
+    }
+  });
+  res.json(routes);
+});
+
 
 // ================== ROUTES ==================
 // Auth endpoints at root: /register, /login
