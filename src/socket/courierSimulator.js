@@ -1,4 +1,4 @@
-const cities = require("./couriercities");
+const cities = require("./courierCities");
 
 function getRandomCity() {
   return cities[Math.floor(Math.random() * cities.length)];
