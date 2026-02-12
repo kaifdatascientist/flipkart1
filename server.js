@@ -129,11 +129,14 @@ app.get("/", (req, res) => res.status(200).send("OK"));
 
 
 // ================== ROUTES ==================
-app.use("/api", authRoutes);
-// Mount auth at root so `/register` and `/login` also work for browser checks
+// Auth endpoints at root: /register, /login
 app.use("/", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/orders", orderRoutes);
+
+// Products endpoints at /products
+app.use("/products", productRoutes);
+
+// Orders endpoints at /orders
+app.use("/orders", orderRoutes);
 
 
 // ================== DATABASE ==================
