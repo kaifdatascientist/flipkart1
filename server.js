@@ -126,13 +126,9 @@ app.use(express.json());
 
 
 // ================== ROUTES ==================
-// Mount auth routes at both `/api/auth` and root so both
-// `/api/auth/register` and `/register` work (some clients use root paths).
-app.use("/api/auth", authRoutes);
-app.use("/", authRoutes);
+app.use("/api", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
-
 
 
 // ================== DATABASE ==================
