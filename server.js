@@ -16,7 +16,8 @@ const server = http.createServer(app);
 // ================== ALLOWED ORIGINS ==================
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://flipkart-frontend-beta.vercel.app" // ← your real frontend
+  "https://flipkart-frontend-beta.vercel.app", // ← your real frontend
+  "https://flipkart1-f0oe.onrender.com" // ← backend Render domain (allow testing from this origin)
 ];
 
 
@@ -123,10 +124,15 @@ app.use(
 // ================== MIDDLEWARE ==================
 app.use(express.json());
 
+// Health endpoint for quick checks (Render and browsers)
+app.get("/", (req, res) => res.status(200).send("OK"));
+
 
 // ================== ROUTES ==================
 app.use("/api", authRoutes);
-app.use("/api", productRoutes);
+// Mount auth at root so `/register` and `/login` also work for browser checks
+app.use("/", authRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
 
