@@ -13,14 +13,14 @@ const upload = require("../middleware/upload");
 const router = express.Router();
 
 // PUBLIC
-router.get("/", getProducts);
+router.get("/products", getProducts);
 
 // SELLER – GET OWN PRODUCTS (must be before /:id route)
-router.get("/seller/me", protect, getSellerProducts);
+router.get("/products/seller/me", protect, getSellerProducts);
 
 // ADMIN ONLY – CREATE PRODUCT WITH 1–10 IMAGES
 router.post(
-  "/",
+  "/products",
   protect,
   adminOnly,
   upload.array("images", 10), 
@@ -28,7 +28,7 @@ router.post(
 );
 
 // ADMIN ONLY – UPDATE / DELETE (allow image upload)
-router.put("/:id", protect, adminOnly, upload.array("images", 10), updateProduct);
-router.delete("/:id", protect, adminOnly, deleteProduct);
+router.put("/products/:id", protect, adminOnly, upload.array("images", 10), updateProduct);
+router.delete("/products/:id", protect, adminOnly, deleteProduct);
 
 module.exports = router;
