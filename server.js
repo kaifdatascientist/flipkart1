@@ -14,11 +14,14 @@ const server = http.createServer(app);
 // 🔥 Socket.IO setup
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    "https://your-frontend-url.netlify.app",
+    origin: [
+      "http://localhost:3000",
+      "https://your-frontend-url.netlify.app"
+    ],
     credentials: true,
   },
 });
+
 
 // Make io accessible everywhere
 app.set("io", io);
