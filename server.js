@@ -124,9 +124,10 @@ app.use(
 app.use(express.json());
 
 
+
 // ================== ROUTES ==================
 app.use("/api", authRoutes);
-app.use("/api", productRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 
 
