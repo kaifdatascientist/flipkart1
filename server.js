@@ -8,27 +8,33 @@ require("dotenv").config();
 const authRoutes = require("./src/routes/authRoutes");
 const productRoutes = require("./src/routes/productRoutes");
 const orderRoutes = require("./src/routes/orderRoutes");
+
 const app = express();
 const server = http.createServer(app);
 
-// 🔥 Socket.IO setup
+
+// ================== ALLOWED ORIGINS ==================
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://flipkart-frontend-beta.vercel.app" // ← your real frontend
+];
+
+
+// ================== SOCKET.IO ==================
 const io = new Server(server, {
   cors: {
-    origin: [
-      "http://localhost:3000",
-      "https://your-frontend-url.netlify.app"
-    ],
+    origin: allowedOrigins,
     credentials: true,
   },
 });
 
-
-
-// Make io accessible everywhere
+// make io globally accessible
 app.set("io", io);
 
+
 // ================== COURIER STORE ==================
-const activeCouriers = {}; // orderId → interval + coords
+const activeCouriers = {};
+
 
 // ================== SOCKET EVENTS ==================
 const { startCourier } = require("./src/socket/courierSimulator");
@@ -44,13 +50,11 @@ io.on("connection", (socket) => {
     socket.join("admins");
   });
 
-  // 👇 JOIN ORDER ROOM
   socket.on("join-order", (orderId) => {
     socket.join(orderId);
     console.log("📦 Joined order room:", orderId);
   });
 
-  // 👇 START COURIER WHEN USER OPENS MAP
   socket.on("start-courier", ({ orderId, userLat, userLng }) => {
     console.log("🚀 Starting courier for:", orderId);
     startCourier(io, orderId, userLat, userLng);
@@ -62,19 +66,16 @@ io.on("connection", (socket) => {
 });
 
 
-// ================== COURIER SIMULATOR ==================
+// ================== COURIER SIMULATION ==================
 function startCourierSimulation(orderId, userLat, userLng) {
-  // Prevent duplicate simulators
   if (activeCouriers[orderId]) return;
 
-  // Start courier slightly away from user
   let courierLat = userLat + 0.02;
   let courierLng = userLng + 0.02;
 
   console.log(`🚚 Courier started for order ${orderId}`);
 
   const interval = setInterval(() => {
-    // Move courier closer
     courierLat -= 0.001;
     courierLng -= 0.001;
 
@@ -85,12 +86,9 @@ function startCourierSimulation(orderId, userLat, userLng) {
     });
 
     console.log(
-      `📍 Courier → ${orderId}: ${courierLat.toFixed(
-        4
-      )}, ${courierLng.toFixed(4)}`
+      `📍 Courier → ${orderId}: ${courierLat.toFixed(4)}, ${courierLng.toFixed(4)}`
     );
 
-    // Stop when near destination
     if (
       Math.abs(courierLat - userLat) < 0.001 &&
       Math.abs(courierLng - userLng) < 0.001
@@ -104,22 +102,33 @@ function startCourierSimulation(orderId, userLat, userLng) {
   activeCouriers[orderId] = interval;
 }
 
-// expose simulator
 app.set("startCourierSimulation", startCourierSimulation);
 
-// ================== MIDDLEWARE ==================
+
+// ================== EXPRESS CORS ==================
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
+
+// ================== MIDDLEWARE ==================
 app.use(express.json());
+
 
 // ================== ROUTES ==================
 app.use("/api", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+
 
 // ================== DATABASE ==================
 mongoose
@@ -127,8 +136,10 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch(console.error);
 
-// ================== START ==================
+
+// ================== SERVER START ==================
 const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () =>
   console.log(`🚀 Server running with Socket.IO on port ${PORT}`)
 );
