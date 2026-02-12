@@ -138,6 +138,8 @@ app.use("/api/orders", orderRoutes);
 // ================== DATABASE ==================
 // Support both `MONGO_URI` and `MONGODB_URI` keys (some .env examples use different names)
 const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+console.log('Debug: cwd=', process.cwd());
+console.log('Debug: MONGO_URI set?', !!process.env.MONGO_URI, 'MONGODB_URI set?', !!process.env.MONGODB_URI);
 if (mongoUri) {
   mongoose
     .connect(mongoUri)
