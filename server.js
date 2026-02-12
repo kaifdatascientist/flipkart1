@@ -136,10 +136,20 @@ app.use("/api/orders", orderRoutes);
 
 
 // ================== DATABASE ==================
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(console.error);
+// Support both `MONGO_URI` and `MONGODB_URI` keys (some .env examples use different names)
+const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+if (mongoUri) {
+  mongoose
+    .connect(mongoUri)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => {
+      console.error("MongoDB connection error:", err);
+    });
+} else {
+  console.warn(
+    "Warning: MongoDB URI not set (MONGO_URI or MONGODB_URI). Skipping DB connection."
+  );
+}
 
 
 // ================== SERVER START ==================
