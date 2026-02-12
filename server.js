@@ -150,14 +150,14 @@ app.get("/__routes", (req, res) => {
 
 
 // ================== ROUTES ==================
-// Auth endpoints at root: /register, /login
-app.use("/", authRoutes);
+// Auth endpoints at /api: /api/register, /api/login
+app.use("/api", authRoutes);
 
-// Products endpoints at /products
-app.use("/products", productRoutes);
+// Products endpoints at /api/products
+app.use("/api/products", productRoutes);
 
-// Orders endpoints at /orders
-app.use("/orders", orderRoutes);
+// Orders endpoints at /api/orders
+app.use("/api/orders", orderRoutes);
 
 
 // ================== DATABASE ==================
