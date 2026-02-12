@@ -107,7 +107,12 @@ app.set("startCourierSimulation", startCourierSimulation);
 
 
 // ================== EXPRESS CORS ==================
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 
 
 
